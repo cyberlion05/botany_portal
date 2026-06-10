@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block wrapclass %}narrow{% endblock %}
+{% block content %}
+
+{% if locked %}
+{# ── LOCKED: show countdown ── #}
+<section class="hero" style="text-align:center;padding:44px 24px">
+  <div class="hero-content" style="margin:0 auto">
+    <div class="eyebrow">Attendance desk</div>
+    <h1>Not open yet</h1>
+    {% if event and event.date and event.time %}
+      <p class="lead" style="margin:10px auto 24px;color:var(--sage)">
+        {{ event.name }} starts in:
+      </p>
+      <div class="countdown-display" id="countdownWrap">
+        <div class="cd-unit"><span class="cd-num" id="cd-days">--</span><span class="cd-label">days</span></div>
+        <span class="cd-sep">:</span>
+        <div class="cd-unit"><span class="cd-num" id="cd-hrs">--</span><span class="cd-label">hrs</span></div>
+        <span class="cd-sep">:</span>
+        <div class="cd-unit"><span class="cd-num" id="cd-min">--</span><span class="cd-label">min</span></div>
+        <span class="cd-sep">:</span>
+        <div class="cd-unit"><span class="cd-num" id="cd-sec">--</span><span class="cd-label">sec</span></div>
+      </div>
+      <p class="muted" style="margin-top:18px;color:var(--sage)">
+        📅 {{ event.date.strftime('%d %B %Y') }} &nbsp;·&nbsp;
+        🕐 {{ event.time.strftime('%I:%M %p') }}
+        {% if event.venue %}&nbsp;·&nbsp; 📍 {{ event.venue }}{% endif %}
+      </p>
+      <script>
+        var eventTime = new Date("{{ event.date.isoformat() }}T{{ event.time.strftime('%H:%M:%S') }}");
+        function pad(n){ return String(n).padStart(2,'0'); }
+        function tick(){
+          var diff = eventTime - Date.now();
+          if(diff <= 0){
+            // Time has arrived — auto-open kicks in on reload
+            document.getElementById('countdownWrap').innerHTML =
+              '<p style="font-family:var(--display);font-size:1.4rem;color:var(--pollen)">🎉 Event time has arrived!</p>' +
+              '<p style="color:var(--sage);margin-top:8px">Refreshing the page…</p>';
+            setTimeout(function(){ location.reload(); }, 1500);
+            return;
+          }
+          document.getElementById('cd-days').textContent = pad(Math.floor(diff/86400000));
+          document.getElementById('cd-hrs').textContent  = pad(Math.floor((diff%86400000)/3600000));
+          document.getElementById('cd-min').textContent  = pad(Math.floor((diff%3600000)/60000));
+          document.getElementById('cd-sec').textContent  = pad(Math.floor((diff%60000)/1000));
+        }
+        tick(); setInterval(tick, 1000);
+      </script>
+    {% else %}
+      <p class="lead" style="color:var(--sage);margin-top:16px">
+        The attendance desk will open when the admin starts the event.<br>
+        Please check back at the event time.
+      </p>
+    {% endif %}
+  </div>
+</section>
+
+{% else %}
+{# ── OPEN: normal check-in form ── #}
+<section class="hero" style="text-align:center;padding:44px 32px">
+  <div class="hero-content" style="margin:0 auto">
+    <div class="eyebrow">Event check-in</div>
+    <h1>Welcome! 🌿</h1>
+    <p class="lead" style="margin:12px auto 0">Enter your roll number to confirm your attendance.</p>
+  </div>
+</section>
+<form class="card reveal" method="post">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <label for="roll_number">Roll number</label>
+  <input id="roll_number" name="roll_number" autofocus required placeholder="e.g. BOT24-014">
+  <button class="btn full leafy" type="submit" style="margin-top:16px">Confirm &amp; enter →</button>
+</form>
+{% endif %}
+{% endblock %}

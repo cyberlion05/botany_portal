@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block content %}
+{% include "admin/_nav.html" %}
+<div class="eyebrow reveal">Voices</div><h1 class="reveal">Feedback &amp; suggestions</h1>
+<div class="grid g2" style="margin-top:14px">
+  <div class="card reveal"><h3>💬 Event feedback</h3>
+  {% if items %}{% for f in items %}<div style="border-bottom:1px solid var(--line);padding:10px 0"><b>{{ f.name }}</b> <span class="pill gold">{{ '★' * (f.rating or 0) }}</span><p class="muted" style="margin:4px 0 0">{{ f.comments }}</p></div>{% endfor %}{% else %}<p class="muted">No feedback yet.</p>{% endif %}
+  </div>
+  <div class="card reveal"><h3>💡 Team suggestions</h3>
+  {% if suggestions %}{% for s in suggestions %}<div style="border-bottom:1px solid var(--line);padding:10px 0"><p style="margin:0">{{ s.body }}</p><span class="muted" style="font-size:.78rem">— {{ s.author }} · {{ s.created_at.strftime('%d %b') }}</span></div>{% endfor %}{% else %}<p class="muted">No suggestions yet.</p>{% endif %}
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="eyebrow reveal">Access control</div>
+<h1 class="reveal">Coordinator permissions</h1>
+<p class="lead reveal" style="margin-bottom:18px">Turn each coordinator's abilities on or off. You (admin) always have full access. Unticked items disappear from that coordinator's menu and are blocked if accessed directly.</p>
+
+{% if coordinators %}
+<div class="grid" style="gap:14px">
+  {% for c in coordinators %}
+  <form class="card reveal" method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <input type="hidden" name="coordinator_id" value="{{ c.id }}">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:12px">
+      <h3 style="margin:0">{{ c.name }} <span class="muted" style="font-weight:400;font-size:.85rem">@{{ c.username }}</span></h3>
+      <button class="btn leafy sm" type="submit">Save</button>
+    </div>
+    <div class="perm-grid">
+      {% for key, label in perms %}
+      <label class="perm-check"><input type="checkbox" name="perm_{{ key }}" {{ 'checked' if c.has_perm(key) }}> <span>{{ label }}</span></label>
+      {% endfor %}
+    </div>
+  </form>
+  {% endfor %}
+</div>
+{% else %}
+<div class="empty">No coordinators yet. Add them under Accounts, then set their permissions here.</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="eyebrow reveal">What we have</div>
+<h1 class="reveal">Facilities</h1>
+{% if setting('facilities_intro') %}<p class="lead reveal">{{ setting('facilities_intro') }}</p>{% endif %}
+{% if facilities %}
+<div class="grid g3" style="margin-top:18px">
+  {% for c in facilities %}<div class="card reveal"><div class="ic" style="font-size:1.8rem">{{ c.icon }}</div><h3>{{ c.title }}</h3><p class="muted">{{ c.description }}</p></div>{% endfor %}
+</div>
+{% else %}<div class="empty">Facilities will be listed here soon.</div>{% endif %}
+{% endblock %}

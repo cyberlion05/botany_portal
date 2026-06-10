@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block wrapclass %}narrow{% endblock %}
+{% block content %}
+<div class="eyebrow reveal">Account settings</div>
+<h1 class="reveal">My Account</h1>
+<p class="lead reveal" style="margin-bottom:20px">Update your login credentials. Changes take effect immediately.</p>
+
+<div class="card reveal" style="margin-bottom:16px">
+  <h3>🪪 Change Username (Login ID)</h3>
+  <p class="muted" style="margin-bottom:12px">Current username: <strong>{{ current_user.username }}</strong></p>
+  <form method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <input type="hidden" name="action" value="username">
+    <label for="new_username">New username</label>
+    <input id="new_username" name="new_username" placeholder="Enter new username" required>
+    <button class="btn leafy" type="submit" style="margin-top:12px">Update username</button>
+  </form>
+</div>
+
+<div class="card reveal">
+  <h3>🔑 Change Password</h3>
+  <form method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <input type="hidden" name="action" value="password">
+    {% if current_user.password_protected %}
+    <label for="current_password">Current password</label>
+    <input id="current_password" name="current_password" type="password" required>
+    {% endif %}
+    <label for="new_password">New password</label>
+    <input id="new_password" name="new_password" type="password" required minlength="6">
+    <label for="confirm_password">Confirm new password</label>
+    <input id="confirm_password" name="confirm_password" type="password" required minlength="6">
+    <button class="btn leafy" type="submit" style="margin-top:12px">Update password</button>
+  </form>
+</div>
+{% endblock %}

@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="eyebrow reveal">Communication</div>
+<h1 class="reveal">Announcements</h1>
+
+{# ── Admin post form ── #}
+<form class="card reveal" method="post" style="margin-bottom:22px">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <p class="note" style="margin-bottom:12px">Posts from the admin go live immediately.</p>
+  <label>Title</label><input name="title" required>
+  <label>Body</label><textarea name="body" required></textarea>
+  <button class="btn leafy" type="submit" style="margin-top:12px">📣 Publish now</button>
+</form>
+
+{# ── Pending queue ── #}
+{% if pending %}
+<div class="section-title reveal">
+  <h2>⏳ Pending approval <span class="pill bloom">{{ pending|length }}</span></h2>
+</div>
+<div class="grid" style="gap:10px;margin-bottom:24px">
+  {% for a in pending %}
+  <div class="card reveal" style="border-left:4px solid var(--pollen)">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap">
+      <div style="flex:1">
+        <h3 style="margin-bottom:4px">{{ a.title }}</h3>
+        <p class="muted" style="margin-bottom:4px">{{ a.body }}</p>
+        <p class="muted" style="font-size:.78rem">by {{ a.author }} · {{ a.created_at.strftime('%d %b %Y, %H:%M') }}</p>
+      </div>
+      <div style="display:flex;gap:8px;flex-shrink:0">
+        <form method="post" action="{{ url_for('admin_approve_announcement', aid=a.id) }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button class="btn leafy sm">✓ Approve</button>
+        </form>
+        <form method="post" action="{{ url_for('admin_reject_announcement', aid=a.id) }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button class="btn danger sm">✕ Reject</button>
+        </form>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+{# ── Published ── #}
+<div class="section-title reveal"><h2>✅ Published</h2></div>
+<div class="card reveal">
+  {% if approved %}
+  <table><tbody>
+    {% for a in approved %}
+    <tr>
+      <td><b>{{ a.title }}</b><br>
+          <span class="muted" style="font-size:.85rem">{{ a.body }}</span><br>
+          <span class="muted" style="font-size:.75rem">— {{ a.author }} · {{ a.created_at.strftime('%d %b %Y') }}</span></td>
+      <td style="text-align:right;white-space:nowrap">
+        <form method="post" action="{{ url_for('admin_delete_announcement', aid=a.id) }}" style="display:inline">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button class="btn danger sm">Delete</button>
+        </form>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody></table>
+  {% else %}<div class="empty">No published announcements yet.</div>{% endif %}
+</div>
+
+{# ── Rejected (collapsed) ── #}
+{% if rejected %}
+<details style="margin-top:16px">
+  <summary class="btn ghost dark sm" style="display:inline-flex">Show {{ rejected|length }} rejected</summary>
+  <div class="card" style="margin-top:10px;opacity:.7">
+    {% for a in rejected %}<p><b>{{ a.title }}</b> <span class="muted">— {{ a.author }}</span></p>{% endfor %}
+  </div>
+</details>
+{% endif %}
+{% endblock %}

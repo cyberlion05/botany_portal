@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block content %}
+{% include "admin/_nav.html" %}
+<div class="eyebrow reveal">Site text</div>
+<h1 class="reveal">Content editor</h1>
+<p class="lead reveal" style="margin-bottom:16px">Edit the words shown across the public site. Changes go live immediately.</p>
+<form class="card reveal" method="post">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <label>About — title</label><input name="about_title" value="{{ setting('about_title','About the Department') }}">
+  <label>About — body</label><textarea name="about_body">{{ setting('about_body') }}</textarea>
+  <label>About — HOD message / note</label><input name="about_hod" value="{{ setting('about_hod') }}">
+  <label>Facilities — intro</label><textarea name="facilities_intro">{{ setting('facilities_intro') }}</textarea>
+  <label>Excursion — intro</label><textarea name="excursion_intro">{{ setting('excursion_intro') }}</textarea>
+  <label>Invitation — title</label><input name="invitation_title" value="{{ setting('invitation_title') }}">
+  <label>Invitation — body</label><textarea name="invitation_body">{{ setting('invitation_body') }}</textarea>
+  <label>Footer note</label><input name="footer_note" value="{{ setting('footer_note') }}">
+  <button class="btn leafy" type="submit" style="margin-top:14px">Save content</button>
+</form>
+{% endblock %}

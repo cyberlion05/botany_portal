@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block content %}
+{% include "admin/_nav.html" %}
+<div class="eyebrow reveal">Counter</div><h1 class="reveal">Tiffin desk</h1>
+<p class="lead reveal" style="margin-bottom:8px">Only students who accepted tiffin appear here.</p>
+<p class="note reveal" style="margin-bottom:16px">Rule: a student must be <b>present</b> to collect tiffin. For an absent student, use <b>Mark present &amp; give</b>.</p>
+<div class="card reveal">
+  <table><thead><tr><th>Name</th><th>Meal</th><th>Present?</th><th>Tiffin</th>{% if current_user.is_admin %}<th>Given by</th>{% endif %}<th></th></tr></thead><tbody>
+  {% for u, t in rows %}
+    <tr>
+      <td><b>{{ u.name }}</b><br><span class="muted" style="font-size:.8rem">{{ u.roll_number }}</span></td>
+      <td><span class="pill {{ t.meal_type }}">{{ 'Veg' if t.meal_type=='veg' else 'Non-veg' }}</span></td>
+      <td>{% if u.attendance %}<span class="pill ok">Yes</span>{% else %}<span class="pill no">No</span>{% endif %}</td>
+      <td>{% if t.collected %}<span class="pill ok">Collected</span>{% else %}<span class="muted">Pending</span>{% endif %}</td>
+      {% if current_user.is_admin %}<td class="muted">{{ t.collected_by or '—' }}</td>{% endif %}
+      <td style="text-align:right;white-space:nowrap">
+        {% if t.collected %}
+          <form method="post" action="{{ url_for('collect_tiffin', uid=u.id) }}" style="display:inline"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn ghost sm">Undo</button></form>
+        {% elif u.attendance %}
+          <form method="post" action="{{ url_for('collect_tiffin', uid=u.id) }}" style="display:inline"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn leafy sm">Mark collected</button></form>
+        {% else %}
+          <form method="post" action="{{ url_for('collect_tiffin', uid=u.id) }}" style="display:inline"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="also_present" value="1"><button class="btn gold sm">Mark present &amp; give</button></form>
+        {% endif %}
+      </td>
+    </tr>
+  {% endfor %}
+  </tbody></table>
+  {% if not rows %}<div class="empty">No one has accepted tiffin yet.</div>{% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,13 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Under maintenance · {{ DEPT }}</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Nunito+Sans:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"></head>
+<body>
+<main class="wrap narrow" style="min-height:80vh;display:grid;place-content:center;text-align:center">
+  <div style="font-size:3.4rem">🌱</div>
+  <h1>Just tending the garden</h1>
+  <p class="lead" style="margin:0 auto">This site is under scheduled maintenance and will be back shortly. Thanks for your patience.</p>
+  <p class="muted" style="margin-top:20px"><a class="link" href="{{ url_for('auth_login') }}">Admin sign in</a></p>
+</main>
+</body></html>

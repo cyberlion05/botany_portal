@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="eyebrow reveal">Event Management</div>
+<h1 class="reveal">Welcome, {{ current_user.name.split()[0] }} 🌿</h1>
+
+{# ── Active event card ── #}
+{% if active_event %}
+<div class="event-hero-card reveal" style="margin-bottom:18px">
+  <div class="event-hero-eyebrow">📅 Active Event</div>
+  <h2 class="event-hero-name">{{ active_event.name }}</h2>
+  {% if active_event.tagline %}<p class="event-hero-tagline">{{ active_event.tagline }}</p>{% endif %}
+  <div class="event-hero-meta">
+    {% if active_event.date %}<div class="event-meta-item"><span class="event-meta-icon">🗓️</span><span>{{ active_event.date.strftime('%A, %d %B %Y') }}</span></div>{% endif %}
+    {% if active_event.time %}<div class="event-meta-item"><span class="event-meta-icon">🕐</span><span>{{ active_event.time.strftime('%I:%M %p') }}</span></div>{% endif %}
+    {% if active_event.venue %}<div class="event-meta-item"><span class="event-meta-icon">📍</span><span>{{ active_event.venue }}</span></div>{% endif %}
+  </div>
+</div>
+{% else %}
+<div class="note reveal" style="margin-bottom:18px">⏳ No event scheduled yet — the admin will set one up soon.</div>
+{% endif %}
+
+{# ── Quick stats ── #}
+<div class="grid g4 stats-grid reveal" style="margin-bottom:18px">
+  <div class="stat moss"><div class="n">{{ stats.present }}</div><div class="l">Checked in</div></div>
+  <div class="stat reveal"><div class="n">{{ stats.tiffin_yes }}</div><div class="l">Tiffin accepted</div></div>
+  <div class="stat reveal">
+    <div class="n">{{ stats.roster_done }}<span style="font-size:1rem;opacity:.7">/{{ stats.roster_total }}</span></div>
+    <div class="l">Tasks done</div>
+  </div>
+  <div class="stat {{ 'bloom' if stats.pending > 0 else 'reveal' }}">
+    <div class="n">{{ stats.pending }}</div>
+    <div class="l">My announcements pending</div>
+  </div>
+</div>
+
+{# ── My own status ── #}
+<div class="grid g2" style="margin-bottom:18px">
+  <div class="card reveal">
+    <h3>✅ My attendance</h3>
+    {% if my_attendance %}<span class="pill ok">Checked in ({{ my_attendance.method|upper }})</span>
+    {% else %}<p class="muted">Not checked in — scan the event QR at the gate.</p>{% endif %}
+  </div>
+  <div class="card reveal">
+    <h3>🍱 My tiffin</h3>
+    {% if my_tiffin and my_tiffin.choice == 'accept' %}
+      <span class="pill {{ my_tiffin.meal_type }}">{{ 'Veg' if my_tiffin.meal_type=='veg' else 'Non-veg' }}</span>
+      {% if my_tiffin.collected %}<span class="pill ok">Collected</span>{% endif %}
+    {% elif my_tiffin %}<p class="muted">Declined.</p>
+    {% else %}<p class="muted">Not set — <a href="{{ url_for('portal_tiffin') }}" style="color:var(--moss)">choose now</a>.</p>{% endif %}
+  </div>
+</div>
+
+{# ── Recent announcements ── #}
+{% if announcements %}
+<div class="section-title reveal"><h2>📣 Recent announcements</h2></div>
+<div class="grid" style="gap:10px">
+  {% for a in announcements %}
+  <div class="card reveal">
+    <h3 style="margin-bottom:4px">{{ a.title }}</h3>
+    <p class="muted" style="font-size:.9rem">{{ a.body }}</p>
+    <p class="muted" style="font-size:.75rem;margin-top:6px">— {{ a.author }} · {{ a.created_at.strftime('%d %b') }}</p>
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+{% endblock %}

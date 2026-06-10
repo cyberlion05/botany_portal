@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block content %}
+{% include "admin/_nav.html" %}
+<div class="eyebrow reveal">Event schedule</div><h1 class="reveal">Programme Plan</h1>
+<p class="lead reveal" style="margin-bottom:14px">Coordinators see serial number, type, performer and prize/gift — <b>not the time</b>. Students and faculty do not see the programme at all.</p>
+<form class="card reveal" method="post" style="margin-bottom:18px">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <div class="grid g3">
+    <div style="grid-column:span 2"><label>Item title</label><input name="title" required></div>
+    <div><label>Serial / order</label><input name="sort_order" type="number" value="{{ items|length + 1 }}"></div>
+  </div>
+  <div class="grid g3">
+    <div><label>Programme type</label><input name="program_type" placeholder="Cultural / Academic / Prize Distribution…"></div>
+    <div><label>Performer / presenter</label><input name="performer" placeholder="Name or group"></div>
+    <div><label>Prize / gift given by</label><input name="prize_giver" placeholder="Leave blank if N/A"></div>
+  </div>
+  <div class="grid g3">
+    <div><label>Time <span class="muted" style="font-weight:400">(admin only)</span></label><input name="start_time" placeholder="10:30 AM"></div>
+    <div><label>Venue</label><input name="venue"></div>
+    <div><label>Description</label><input name="description"></div>
+  </div>
+  <button class="btn leafy" type="submit" style="margin-top:12px">+ Add item</button>
+</form>
+<div class="card reveal">
+  {% if items %}
+  <table>
+    <thead><tr><th>#</th><th>Title</th><th>Type</th><th>Performer</th><th>Prize by</th><th>Time (admin)</th><th></th></tr></thead>
+    <tbody>
+    {% for it in items %}
+    <tr>
+      <td>{{ loop.index }}</td>
+      <td><b>{{ it.title }}</b></td>
+      <td class="muted">{{ it.program_type or '—' }}</td>
+      <td class="muted">{{ it.performer or '—' }}</td>
+      <td class="muted">{{ it.prize_giver or '—' }}</td>
+      <td class="muted">{{ it.start_time or '—' }}</td>
+      <td style="text-align:right">
+        <form method="post" action="{{ url_for('admin_delete_program', pid=it.id) }}" style="display:inline">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button class="btn danger sm">Delete</button>
+        </form>
+      </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% else %}<div class="empty">No programme items yet.</div>{% endif %}
+</div>
+{% endblock %}

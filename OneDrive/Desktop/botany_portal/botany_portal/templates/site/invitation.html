@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+{% block wrapclass %}narrow{% endblock %}
+{% block content %}
+
+{# ── Event card (always shown when event is published) ── #}
+{% if active_event %}
+<div class="event-hero-card reveal">
+  <div class="event-hero-eyebrow">📅 Upcoming Event</div>
+  <h2 class="event-hero-name">{{ active_event.name }}</h2>
+  {% if active_event.tagline %}<p class="event-hero-tagline">{{ active_event.tagline }}</p>{% endif %}
+  <div class="event-hero-meta">
+    {% if active_event.date %}
+    <div class="event-meta-item">
+      <span class="event-meta-icon">🗓️</span>
+      <span>{{ active_event.date.strftime('%A, %d %B %Y') }}</span>
+    </div>
+    {% endif %}
+    {% if active_event.time %}
+    <div class="event-meta-item">
+      <span class="event-meta-icon">🕐</span>
+      <span>{{ active_event.time.strftime('%I:%M %p') }}</span>
+    </div>
+    {% endif %}
+    {% if active_event.venue %}
+    <div class="event-meta-item">
+      <span class="event-meta-icon">📍</span>
+      <span>{{ active_event.venue }}</span>
+    </div>
+    {% endif %}
+  </div>
+  {% if active_event.description %}<p class="event-hero-desc">{{ active_event.description }}</p>{% endif %}
+
+  {# ── Live countdown ── #}
+  {% if active_event.date and active_event.time %}
+  <div style="margin-top:16px;padding-top:14px;border-top:1px solid rgba(255,255,255,.12)">
+    <p style="font-size:.75rem;text-transform:uppercase;letter-spacing:2px;color:var(--sage);margin-bottom:10px;font-weight:800">Event starts in</p>
+    <div class="countdown-display" id="invCountdown" style="justify-content:flex-start">
+      <div class="cd-unit"><span class="cd-num" id="icd-days">--</span><span class="cd-label">days</span></div>
+      <span class="cd-sep">:</span>
+      <div class="cd-unit"><span class="cd-num" id="icd-hrs">--</span><span class="cd-label">hrs</span></div>
+      <span class="cd-sep">:</span>
+      <div class="cd-unit"><span class="cd-num" id="icd-min">--</span><span class="cd-label">min</span></div>
+      <span class="cd-sep">:</span>
+      <div class="cd-unit"><span class="cd-num" id="icd-sec">--</span><span class="cd-label">sec</span></div>
+    </div>
+  </div>
+  <script>
+    (function(){
+      var t = new Date("{{ active_event.date.isoformat() }}T{{ active_event.time.strftime('%H:%M:%S') }}");
+      function pad(n){ return String(n).padStart(2,'0'); }
+      function tick(){
+        var d = t - Date.now();
+        if(d <= 0){
+          document.getElementById('invCountdown').innerHTML =
+            '<span style="color:var(--pollen);font-weight:800;font-size:1rem">🎉 The event has started!</span>';
+          return;
+        }
+        document.getElementById('icd-days').textContent = pad(Math.floor(d/86400000));
+        document.getElementById('icd-hrs').textContent  = pad(Math.floor((d%86400000)/3600000));
+        document.getElementById('icd-min').textContent  = pad(Math.floor((d%3600000)/60000));
+        document.getElementById('icd-sec').textContent  = pad(Math.floor((d%60000)/1000));
+      }
+      tick(); setInterval(tick, 1000);
+    })();
+  </script>
+  {% endif %}
+</div>
+{% endif %}
+
+{# ── Invitation content + RSVP ── #}
+{% if invitation_live %}
+  <section class="hero" style="text-align:center;padding:36px 28px;margin-top:14px">
+    <div class="hero-content" style="margin:0 auto">
+      <div class="eyebrow">You're invited</div>
+      <h1>{{ setting('invitation_title', 'A Botanical Celebration') }}</h1>
+      <p class="lead" style="margin:10px auto 0;white-space:pre-line">{{ setting('invitation_body', 'The Department of Botany warmly invites all faculty and students to our upcoming event.') }}</p>
+    </div>
+  </section>
+
+  {% if current_user.is_authenticated and not current_user.is_admin %}
+  <div class="card reveal" style="margin-top:14px">
+    <h3>Will you join us?</h3>
+    <p class="note">Your response is required so we can arrange seating and meals.</p>
+    {% if rsvp and rsvp.responded_at %}
+    <p style="margin-top:10px">Your response:
+      <span class="pill {{ 'ok' if rsvp.accepted else 'no' }}">{{ 'Accepted ✓' if rsvp.accepted else 'Declined' }}</span>
+    </p>
+    {% endif %}
+    <form method="post" action="{{ url_for('invitation_accept') }}" style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <button class="btn leafy" name="answer" value="yes" type="submit">✓ Accept invitation</button>
+      <button class="btn danger" name="answer" value="no" type="submit">Can't make it</button>
+    </form>
+  </div>
+  {% elif not current_user.is_authenticated %}
+  <div class="card reveal" style="text-align:center;margin-top:14px">
+    <p class="muted">Please <a href="{{ url_for('auth_login') }}" style="color:var(--moss);font-weight:800">sign in</a> to accept your invitation.</p>
+  </div>
+  {% endif %}
+
+{% elif active_event %}
+  {# Event is scheduled but invitation not sent yet #}
+  <div class="card reveal" style="text-align:center;margin-top:14px">
+    <div style="font-size:2rem;margin-bottom:10px">🌿</div>
+    <h3>Invitation coming soon</h3>
+    <p class="muted">The event has been scheduled. The formal invitation will be shared shortly — check back here!</p>
+  </div>
+
+{% else %}
+  {# No event scheduled at all #}
+  <div class="card reveal" style="text-align:center">
+    <div style="font-size:2rem;margin-bottom:10px">📭</div>
+    <h3>No event scheduled yet</h3>
+    <p class="muted">The next departmental event hasn't been announced. Check back here when it is!</p>
+  </div>
+{% endif %}
+{% endblock %}

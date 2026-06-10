@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="eyebrow reveal">Edit</div>
+<h1 class="reveal">Edit Faculty — {{ faculty.name }}</h1>
+<form class="card reveal" method="post" enctype="multipart/form-data" style="margin-top:14px">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <div class="grid g3">
+    <div><label>Name</label><input name="name" value="{{ faculty.name }}" required></div>
+    <div><label>Designation</label><input name="designation" value="{{ faculty.designation or '' }}"></div>
+    <div><label>Order</label><input name="sort_order" type="number" value="{{ faculty.sort_order }}"></div>
+  </div>
+  <div class="grid g2">
+    <div><label>Qualification</label><input name="qualification" value="{{ faculty.qualification or '' }}"></div>
+    <div><label>Email</label><input name="email" type="email" value="{{ faculty.email or '' }}"></div>
+  </div>
+  <label>Area of Interest <span class="muted" style="font-weight:400">(one topic per line)</span></label>
+  <textarea name="specialization" rows="4">{{ faculty.specialization or '' }}</textarea>
+  <label>Replace photo <span class="muted" style="font-weight:400">(leave blank to keep current)</span></label>
+  {% if faculty.photo %}
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
+    <img src="{{ url_for('static', filename='uploads/' ~ faculty.photo) }}" alt="" style="width:64px;height:64px;border-radius:50%;object-fit:cover">
+    <span class="muted" style="font-size:.85rem">Current photo</span>
+  </div>
+  {% endif %}
+  <input type="file" name="photo" accept="image/*">
+  <div style="display:flex;gap:10px;margin-top:16px">
+    <button class="btn leafy" type="submit">Save changes</button>
+    <a class="btn ghost dark" href="{{ url_for('admin_faculty') }}">Cancel</a>
+  </div>
+</form>
+{% endblock %}

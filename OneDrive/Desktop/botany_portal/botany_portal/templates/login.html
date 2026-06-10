@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block wrapclass %}narrow{% endblock %}
+{% block content %}
+<div class="eyebrow reveal">Members only</div>
+<h1 class="reveal">Sign in</h1>
+<p class="lead reveal" style="margin-bottom:18px">Choose who you are, then sign in. Accounts are created by the admin — there's no public sign-up.</p>
+
+<div class="role-tabs reveal" id="roleTabs">
+  <button type="button" data-role="student" class="role-tab">🎓 Student</button>
+  <button type="button" data-role="faculty" class="role-tab">👩‍🏫 Faculty</button>
+  <button type="button" data-role="coordinator" class="role-tab">📋 Coordinator</button>
+</div>
+
+{# ── Student ── #}
+<form class="card role-form reveal" id="form-student" method="post">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <input type="hidden" name="role" value="student">
+  <label for="s_roll">Roll number</label>
+  <input id="s_roll" name="roll_number" placeholder="e.g. BOT24-014" required>
+  <label for="s_pw">Password</label>
+  <input id="s_pw" name="password" type="password" inputmode="numeric" placeholder="Last 6 digits of your mobile" required>
+  <p class="muted" style="font-size:.82rem;margin-top:6px">Your password is the last 6 digits of the mobile number you gave the department.</p>
+  <button class="btn full leafy" type="submit" style="margin-top:16px">Enter the portal →</button>
+</form>
+
+{# ── Faculty ── #}
+<form class="card role-form reveal" id="form-faculty" method="post" style="display:none">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <input type="hidden" name="role" value="faculty">
+  <label for="f_name">Select your name</label>
+  {% if faculty_accounts %}
+  <select id="f_name" name="faculty" required>
+    <option value="" disabled selected>— choose your name —</option>
+    {% for fa in faculty_accounts %}<option value="{{ fa.username }}">{{ fa.name }}</option>{% endfor %}
+  </select>
+  <button class="btn full leafy" type="submit" style="margin-top:16px">Enter the portal →</button>
+  {% else %}
+  <p class="muted">No faculty accounts yet. Please ask the admin to add you.</p>
+  {% endif %}
+</form>
+
+{# ── Coordinator (also admin) ── #}
+<form class="card role-form reveal" id="form-coordinator" method="post" style="display:none">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <input type="hidden" name="role" value="coordinator">
+  <label for="c_user">Username</label>
+  <input id="c_user" name="username">
+  <label for="c_pw">Password</label>
+  <input id="c_pw" name="password" type="password">
+  <button class="btn full leafy" type="submit" style="margin-top:16px">Enter the portal →</button>
+</form>
+
+<script>
+(function(){
+  var active = "{{ active_role }}";
+  var tabs = document.querySelectorAll('.role-tab');
+  var forms = {
+    student: document.getElementById('form-student'),
+    faculty: document.getElementById('form-faculty'),
+    coordinator: document.getElementById('form-coordinator')
+  };
+  function show(role){
+    Object.keys(forms).forEach(function(k){ forms[k].style.display = (k===role ? 'block' : 'none'); });
+    tabs.forEach(function(t){ t.classList.toggle('active', t.dataset.role===role); });
+  }
+  tabs.forEach(function(t){ t.addEventListener('click', function(){ show(t.dataset.role); }); });
+  show(forms[active] ? active : 'student');
+})();
+</script>
+{% endblock %}

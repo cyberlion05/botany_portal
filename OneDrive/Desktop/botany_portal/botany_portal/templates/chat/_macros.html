@@ -1,0 +1,43 @@
+{% macro render_poll(p, pd) %}
+{% set d = pd[p.id] %}
+{% set total = d.total %}
+<div class="poll-card" id="poll-{{ p.id }}">
+  <div class="poll-q-row">
+    <span class="poll-question">📊 <strong>{{ p.question }}</strong></span>
+    <span style="display:flex;gap:6px;align-items:center;flex-shrink:0">
+      {% if p.closed %}<span class="pill no" style="font-size:.72rem">Closed</span>{% endif %}
+      {% if d.can_close and not p.closed %}<button class="btn ghost sm" onclick="closePoll({{ p.id }})">Close</button>{% endif %}
+    </span>
+  </div>
+  {% for opt in p.options %}
+    {% set ov = d.counts.get(opt.id, 0) %}
+    {% set pct = (ov * 100 // total) if total > 0 else 0 %}
+    <div class="poll-option{% if d.my_vote or p.closed %} voted{% endif %}"
+         {% if not d.my_vote and not p.closed %}onclick="castVote({{ p.id }}, {{ opt.id }})"{% endif %}>
+      <div class="poll-bar-fill" style="width:{{ pct }}%"></div>
+      <span class="poll-opt-text">{{ opt.text }}</span>
+      {% if d.my_vote or p.closed %}<span class="poll-opt-stat">{{ pct }}% · {{ ov }}</span>{% endif %}
+      {% if d.my_vote == opt.id %}<span class="poll-your-vote">✓ your vote</span>{% endif %}
+    </div>
+  {% endfor %}
+  <div class="poll-footer">by {{ p.creator_name }} · {{ total }} vote{{ 's' if total != 1 }}</div>
+</div>
+{% endmacro %}
+
+{% macro poll_create_form() %}
+<div id="pollForm" style="display:none" class="poll-form">
+  <h4>📊 Create a poll</h4>
+  <label>Question</label>
+  <input id="pollQuestion" placeholder="e.g. Which venue do you prefer?" class="poll-opt-inp" style="margin-bottom:10px">
+  <label>Options <span class="muted" style="font-weight:400">(min 2, max 6)</span></label>
+  <div id="pollOptions">
+    <div style="display:flex;gap:6px;margin-top:6px"><input class="poll-opt-inp" name="options[]" placeholder="Option 1" required style="flex:1"></div>
+    <div style="display:flex;gap:6px;margin-top:6px"><input class="poll-opt-inp" name="options[]" placeholder="Option 2" required style="flex:1"></div>
+  </div>
+  <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
+    <button class="btn ghost dark sm" type="button" onclick="addPollOption()">+ Add option</button>
+    <button class="btn leafy sm" type="button" onclick="submitPoll()">Create poll</button>
+    <button class="btn ghost sm" type="button" onclick="togglePollForm()">Cancel</button>
+  </div>
+</div>
+{% endmacro %}

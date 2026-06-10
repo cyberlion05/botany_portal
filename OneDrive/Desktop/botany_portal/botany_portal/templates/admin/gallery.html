@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block content %}
+{% include "admin/_nav.html" %}
+<div class="eyebrow reveal">Photos</div><h1 class="reveal">Gallery</h1>
+<form class="card reveal" method="post" enctype="multipart/form-data" style="margin-bottom:18px">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <div class="grid g2" style="align-items:end"><div><label>Photo</label><input type="file" name="photo" accept="image/*" required></div><div><label>Caption</label><input name="caption"></div></div>
+  <button class="btn leafy" type="submit" style="margin-top:12px">Upload</button>
+</form>
+{% if photos %}<div class="grid g4">
+{% for p in photos %}<div class="card reveal" style="padding:10px"><img src="{{ url_for('static', filename='uploads/' ~ p.filename) }}" style="border-radius:8px;margin-bottom:8px"><p class="muted" style="font-size:.8rem">{{ p.caption }}</p><form method="post" action="{{ url_for('admin_delete_photo', pid=p.id) }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn danger sm full">Delete</button></form></div>{% endfor %}
+</div>{% else %}<div class="empty">No photos uploaded.</div>{% endif %}
+{% endblock %}

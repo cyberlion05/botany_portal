@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block wrapclass %}narrow{% endblock %}
+{% block content %}
+<div class="eyebrow reveal">We're listening</div>
+<h1 class="reveal">Event feedback</h1>
+<form class="card reveal" method="post" style="margin-top:14px">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <label>Your rating</label>
+  <div class="rating-row">
+    {% for n in [5,4,3,2,1] %}<input type="radio" id="r{{n}}" name="rating" value="{{n}}" {{ 'checked' if n==5 }}><label for="r{{n}}">★</label>{% endfor %}
+  </div>
+  <label for="comments">Comments</label>
+  <textarea id="comments" name="comments" placeholder="What did you love? What could be better?"></textarea>
+  <button class="btn full leafy" type="submit" style="margin-top:16px">Send feedback</button>
+</form>
+{% endblock %}

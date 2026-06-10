@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="hero">
+  <svg class="veins" viewBox="0 0 400 200" preserveAspectRatio="none"><path d="M0 100 Q100 40 200 100 T400 100" stroke="white" fill="none" stroke-width="1"/><path d="M200 100 L160 60 M200 100 L240 60 M200 100 L160 140 M200 100 L240 140" stroke="white" fill="none" stroke-width="1"/></svg>
+  <div class="hero-content">
+    <div class="eyebrow">Chandernagore College · Constituent College of the University of Burdwan</div>
+    <h1>Department of <em>Botany</em></h1>
+    <p class="lead">Plant science at Chandernagore College — teaching Botany since 1961, with the B.Sc. course from 1981 and Honours from 1994. This is our student space for the department's life: faculty, facilities, field excursions, magazines, and our events.</p>
+    <div class="row">
+      <a class="btn gold" href="{{ url_for('about') }}">Explore the department</a>
+      <a class="btn ghost" href="{{ url_for('invitation') }}">View event invitation</a>
+    </div>
+  </div>
+</section>
+
+<div class="grid g3" style="margin-bottom:38px">
+  <a class="card tile reveal" href="{{ url_for('faculty') }}"><div class="ic">👩‍🏫</div><h3>Faculty</h3><p class="muted">Meet our teachers and their fields of study.</p></a>
+  <a class="card tile reveal" href="{{ url_for('facilities') }}"><div class="ic">🔬</div><h3>Facilities</h3><p class="muted">Labs, herbarium, garden and more.</p></a>
+  <a class="card tile reveal" href="{{ url_for('excursion') }}"><div class="ic">🏞️</div><h3>Excursions</h3><p class="muted">Field trips and study tours.</p></a>
+  <a class="card tile reveal" href="{{ url_for('magazine') }}"><div class="ic">📖</div><h3>Magazines</h3><p class="muted">Student & wall magazine.</p></a>
+  <a class="card tile reveal" href="{{ url_for('dept_events') }}"><div class="ic">🎪</div><h3>Events</h3><p class="muted">Departmental programmes.</p></a>
+  <a class="card tile reveal" href="{{ url_for('invitation') }}"><div class="ic">✉️</div><h3>Invitation</h3><p class="muted">Our digital invitation & RSVP.</p></a>
+</div>
+
+{% if events %}
+<div class="section-title reveal"><h2>Recent events</h2><a class="link" href="{{ url_for('dept_events') }}">See all →</a></div>
+<div class="grid g3">
+  {% for e in events %}<div class="card reveal"><h3>{{ e.title }}</h3><p class="muted" style="font-size:.85rem">{{ e.date_text }}</p><p class="muted">{{ e.description }}</p></div>{% endfor %}
+</div>
+{% endif %}
+{% endblock %}

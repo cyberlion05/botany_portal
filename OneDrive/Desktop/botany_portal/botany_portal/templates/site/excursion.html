@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="eyebrow reveal">Into the field</div>
+<h1 class="reveal">Excursions</h1>
+{% if setting('excursion_intro') %}<p class="lead reveal">{{ setting('excursion_intro') }}</p>{% endif %}
+{% if items %}
+<div class="grid g2" style="margin-top:18px">
+  {% for x in items %}
+  <div class="card reveal">
+    {% if x.photo %}<img src="{{ url_for('static', filename='uploads/' ~ x.photo) }}" alt="{{ x.title }}" style="border-radius:12px;margin-bottom:12px">{% endif %}
+    <h3>{{ x.title }}</h3>
+    <p class="muted" style="font-weight:700;color:var(--moss)">{{ x.place }}{% if x.date_text %} · {{ x.date_text }}{% endif %}</p>
+    <p class="muted">{{ x.description }}</p>
+  </div>
+  {% endfor %}
+</div>
+{% else %}<div class="empty">Excursion records will appear here.</div>{% endif %}
+{% endblock %}

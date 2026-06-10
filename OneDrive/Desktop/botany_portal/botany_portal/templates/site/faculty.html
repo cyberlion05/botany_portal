@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="eyebrow reveal">Our teachers</div>
+<h1 class="reveal">Faculty</h1>
+{% if faculty %}
+<div class="grid g2" style="margin-top:18px">
+  {% for f in faculty %}
+  <div class="card reveal" style="display:flex;gap:16px;align-items:flex-start">
+    {% if f.photo %}<img class="face" src="{{ url_for('static', filename='uploads/' ~ f.photo) }}" alt="{{ f.name }}">
+    {% else %}<div class="face face-ph">{{ f.name[0] }}</div>{% endif %}
+    <div>
+      <h3 style="margin-bottom:2px">{{ f.name }}</h3>
+      <p class="muted" style="font-weight:700;color:var(--moss)">{{ f.designation }}</p>
+      {% if f.qualification %}<p class="muted" style="font-size:.9rem">{{ f.qualification }}</p>{% endif %}
+      {% if f.specialization %}
+      <div style="margin-top:6px">
+        <p class="muted" style="font-size:.78rem;font-weight:800;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Area of Interest</p>
+        <ul style="margin:0;padding-left:16px;color:var(--muted);font-size:.9rem;line-height:1.7">
+          {% for item in f.specialization.split('\n') %}{% if item.strip() %}<li>{{ item.strip() }}</li>{% endif %}{% endfor %}
+        </ul>
+      </div>
+      {% endif %}
+      {% if f.email %}<p class="muted" style="font-size:.85rem">✉ {{ f.email }}</p>{% endif %}
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% else %}<div class="empty">Faculty details will be added by the admin soon.</div>{% endif %}
+{% endblock %}

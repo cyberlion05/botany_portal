@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="eyebrow reveal">Notice board</div>
+<h1 class="reveal">Announcements</h1>
+{% if items %}
+<div class="grid" style="gap:14px;margin-top:18px">
+  {% for a in items %}<div class="card reveal"><h3>{{ a.title }}</h3><p class="muted" style="white-space:pre-line">{{ a.body }}</p><p class="muted" style="font-size:.78rem;margin-top:10px">— {{ a.author or 'Organizers' }} · {{ a.created_at.strftime('%d %b %Y') }}</p></div>{% endfor %}
+</div>
+{% else %}<div class="empty">No announcements yet.</div>{% endif %}
+{% endblock %}

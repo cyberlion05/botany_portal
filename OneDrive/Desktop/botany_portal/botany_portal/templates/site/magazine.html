@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="eyebrow reveal">Words & walls</div>
+<h1 class="reveal">Magazines</h1>
+<h2 class="reveal" style="margin-top:24px">📖 Student Magazine</h2>
+{% if student %}
+<div class="grid g2">
+  {% for m in student %}<div class="card reveal"><h3>{{ m.title }}</h3>{% if m.author %}<p class="muted" style="font-weight:700">by {{ m.author }}</p>{% endif %}<p class="muted" style="white-space:pre-line">{{ m.body }}</p></div>{% endfor %}
+</div>
+{% else %}<div class="empty">No student magazine entries yet.</div>{% endif %}
+<h2 class="reveal" style="margin-top:34px">🧷 Wall Magazine</h2>
+{% if wall %}
+<div class="grid g2">
+  {% for m in wall %}<div class="card reveal"><h3>{{ m.title }}</h3>{% if m.author %}<p class="muted" style="font-weight:700">by {{ m.author }}</p>{% endif %}<p class="muted" style="white-space:pre-line">{{ m.body }}</p></div>{% endfor %}
+</div>
+{% else %}<div class="empty">No wall magazine entries yet.</div>{% endif %}
+{% endblock %}

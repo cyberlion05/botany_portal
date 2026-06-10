@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block content %}
+{% include "admin/_nav.html" %}
+<div class="eyebrow reveal">People</div><h1 class="reveal">Faculty</h1>
+<form class="card reveal" method="post" enctype="multipart/form-data" style="margin-bottom:18px">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <div class="grid g3"><div><label>Name</label><input name="name" required></div><div><label>Designation</label><input name="designation"></div><div><label>Order</label><input name="sort_order" type="number" value="0"></div></div>
+  <div class="grid g2"><div><label>Qualification</label><input name="qualification"></div><div><label>Email</label><input name="email"></div></div>
+  <label>Area of Interest <span class="muted" style="font-weight:400">(one topic per line — shows as bullet list)</span></label>
+  <textarea name="specialization" rows="3" placeholder="Plant Taxonomy&#10;Mycology&#10;Plant Physiology"></textarea>
+  <label>Photo</label><input type="file" name="photo" accept="image/*">
+  <button class="btn leafy" type="submit" style="margin-top:12px">+ Add faculty</button>
+</form>
+<div class="card reveal">
+  {% if faculty %}
+  <table><thead><tr><th>Name</th><th>Designation</th><th>Area of Interest</th><th></th></tr></thead><tbody>
+  {% for f in faculty %}
+  <tr>
+    <td><b>{{ f.name }}</b></td>
+    <td>{{ f.designation }}</td>
+    <td class="muted" style="max-width:200px">{{ (f.specialization or '').replace('\n',', ') | truncate(60) }}</td>
+    <td style="text-align:right;white-space:nowrap">
+      <a class="btn ghost sm" href="{{ url_for('admin_edit_faculty', fid=f.id) }}">Edit</a>
+      <form method="post" action="{{ url_for('admin_delete_faculty', fid=f.id) }}" style="display:inline">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button class="btn danger sm">Delete</button>
+      </form>
+    </td>
+  </tr>
+  {% endfor %}
+  </tbody></table>
+  {% else %}<div class="empty">No faculty added.</div>{% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="eyebrow reveal">Faculty portal</div>
+<h1 class="reveal">Welcome, {{ current_user.name.split()[0] }}</h1>
+
+{# ── Active event (high visibility) ── #}
+{% if active_event %}
+<div class="event-hero-card reveal" style="margin-bottom:18px">
+  <div class="event-hero-eyebrow">📅 Upcoming Event</div>
+  <h2 class="event-hero-name">{{ active_event.name }}</h2>
+  {% if active_event.tagline %}<p class="event-hero-tagline">{{ active_event.tagline }}</p>{% endif %}
+  <div class="event-hero-meta">
+    {% if active_event.date %}<div class="event-meta-item"><span class="event-meta-icon">🗓️</span><span>{{ active_event.date.strftime('%A, %d %B %Y') }}</span></div>{% endif %}
+    {% if active_event.time %}<div class="event-meta-item"><span class="event-meta-icon">🕐</span><span>{{ active_event.time.strftime('%I:%M %p') }}</span></div>{% endif %}
+    {% if active_event.venue %}<div class="event-meta-item"><span class="event-meta-icon">📍</span><span>{{ active_event.venue }}</span></div>{% endif %}
+  </div>
+  {% if active_event.description %}<p class="event-hero-desc">{{ active_event.description }}</p>{% endif %}
+</div>
+{% endif %}
+
+{# ── Invitation RSVP (high visibility when live) ── #}
+{% if invitation_live %}
+<div class="card reveal" style="border:2px solid var(--pollen);margin-bottom:18px">
+  <h3 style="margin-bottom:8px">✉️ Invitation — please respond</h3>
+  <p class="note" style="margin-bottom:12px">Your response is needed so we can arrange seating and meals.</p>
+  {% if rsvp and rsvp.responded_at %}
+    <p>Your response: <span class="pill {{ 'ok' if rsvp.accepted else 'no' }}">{{ 'Accepted ✓' if rsvp.accepted else 'Declined' }}</span></p>
+    <a class="btn ghost dark sm" href="{{ url_for('invitation') }}" style="margin-top:10px;display:inline-flex">Change response</a>
+  {% else %}
+    <form method="post" action="{{ url_for('invitation_accept') }}" style="display:flex;gap:10px;flex-wrap:wrap">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <button class="btn leafy" name="answer" value="yes" type="submit">✓ Accept</button>
+      <button class="btn danger" name="answer" value="no" type="submit">Can't make it</button>
+    </form>
+  {% endif %}
+</div>
+{% elif not active_event %}
+<div class="note reveal" style="margin-bottom:18px">No event scheduled yet. Check back soon!</div>
+{% endif %}
+
+{# ── Announcements ── #}
+{% if announcements %}
+<div class="section-title reveal"><h2>📣 Announcements</h2><a class="link" href="{{ url_for('announcements') }}">See all →</a></div>
+<div class="grid" style="gap:10px">
+  {% for a in announcements %}
+  <div class="card reveal">
+    <h3 style="margin-bottom:4px">{{ a.title }}</h3>
+    <p class="muted" style="font-size:.9rem">{{ a.body }}</p>
+    <p class="muted" style="font-size:.75rem;margin-top:6px">— {{ a.author }} · {{ a.created_at.strftime('%d %b') }}</p>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="empty reveal">No announcements yet.</div>
+{% endif %}
+{% endblock %}

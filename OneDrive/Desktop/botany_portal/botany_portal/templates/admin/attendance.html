@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block content %}
+{% include "admin/_nav.html" %}
+<div class="eyebrow reveal">Gate</div><h1 class="reveal">Attendance desk</h1>
+<div class="grid g2" style="margin:14px 0 20px">
+  <div class="card reveal">
+    <h3>📱 Event check-in QR</h3>
+    <p class="muted">Print or display this. Students scan it, enter their roll number, and get a "take a seat" greeting.</p>
+    <img src="{{ url_for('event_qr_png') }}" alt="Event QR" style="width:180px;height:180px;margin:10px 0;border:8px solid #fffdf8;border-radius:14px">
+    <p class="muted" style="font-size:.8rem;word-break:break-all">{{ qr_url }}</p>
+  </div>
+  <div class="card reveal">
+    <h3>✍️ Manual check-in</h3>
+    <p class="muted">Use this only if a student's QR scan fails. {% if current_user.is_admin %}The marker's name is recorded and shown to you below.{% endif %}</p>
+    <p class="note">Marking someone present here also lets them collect tiffin.</p>
+  </div>
+</div>
+<div class="card reveal">
+  <table><thead><tr><th>Name</th><th>Roll</th><th>Status</th>{% if current_user.is_admin %}<th>Marked by</th>{% endif %}<th></th></tr></thead><tbody>
+  {% for u in people %}
+    <tr>
+      <td><b>{{ u.name }}</b></td><td class="muted">{{ u.roll_number or '—' }}</td>
+      <td>{% if u.attendance %}<span class="pill ok">Present</span> <span class="muted" style="font-size:.78rem">({{ u.attendance.method }})</span>{% else %}<span class="pill no">Absent</span>{% endif %}</td>
+      {% if current_user.is_admin %}<td class="muted">{{ u.attendance.marked_by if u.attendance else '—' }}</td>{% endif %}
+      <td style="text-align:right"><form method="post" action="{{ url_for('toggle_attendance', uid=u.id) }}" style="display:inline"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn {{ 'danger' if u.attendance else 'leafy' }} sm">{{ 'Undo' if u.attendance else 'Mark present' }}</button></form></td>
+    </tr>
+  {% endfor %}
+  </tbody></table>
+</div>
+{% endblock %}

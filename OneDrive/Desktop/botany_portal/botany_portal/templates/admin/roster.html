@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block content %}
+{% include "admin/_nav.html" %}
+<div class="eyebrow reveal">Checklist</div><h1 class="reveal">Event roster</h1>
+{% if current_user.is_admin %}
+<form class="card reveal" method="post" style="margin-bottom:18px">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <div class="grid g4" style="align-items:end"><div style="grid-column:span 2"><label>Task</label><input name="title" required></div><div><label>Assignee</label><input name="assignee"></div><div><label>Order</label><input name="sort_order" type="number" value="0"></div></div>
+  <button class="btn leafy" type="submit" style="margin-top:12px">+ Add task</button>
+</form>
+{% endif %}
+<div class="card reveal">
+  {% if tasks %}
+  <table><thead><tr><th>Task</th><th>Assignee</th><th>Status</th>{% if current_user.is_admin %}<th>Done by</th>{% endif %}<th></th></tr></thead><tbody>
+  {% for t in tasks %}
+    <tr>
+      <td><b>{{ t.title }}</b></td><td class="muted">{{ t.assignee or '—' }}</td>
+      <td>{% if t.completed %}<span class="pill ok">✓ Done</span>{% else %}<span class="pill no">Pending</span>{% endif %}</td>
+      {% if current_user.is_admin %}<td class="muted">{{ t.completed_by or '—' }}</td>{% endif %}
+      <td style="text-align:right;white-space:nowrap">
+        <form method="post" action="{{ url_for('toggle_roster', tid=t.id) }}" style="display:inline"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn {{ 'ghost' if t.completed else 'leafy' }} sm">{{ 'Reopen' if t.completed else 'Mark done' }}</button></form>
+        {% if current_user.is_admin %}<form method="post" action="{{ url_for('delete_roster', tid=t.id) }}" style="display:inline"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn danger sm">✕</button></form>{% endif %}
+      </td>
+    </tr>
+  {% endfor %}
+  </tbody></table>
+  {% else %}<div class="empty">No tasks yet.</div>{% endif %}
+</div>
+{% endblock %}

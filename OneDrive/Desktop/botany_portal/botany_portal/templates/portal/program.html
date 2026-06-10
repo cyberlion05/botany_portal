@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="eyebrow reveal">Event schedule</div>
+<h1 class="reveal">Programme Plan</h1>
+{% if items %}
+<div class="grid" style="gap:12px;margin-top:16px">
+  {% for item in items %}
+  <div class="card reveal" style="display:flex;gap:16px;align-items:flex-start">
+    <div style="background:var(--forest);color:var(--parch);width:36px;height:36px;border-radius:50%;display:grid;place-items:center;font-family:var(--display);font-weight:700;font-size:1rem;flex-shrink:0">{{ loop.index }}</div>
+    <div style="flex:1">
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px">
+        <h3 style="margin:0">{{ item.title }}</h3>
+        {% if item.program_type %}<span class="pill no" style="font-size:.72rem">{{ item.program_type }}</span>{% endif %}
+        {% if show_time and item.start_time %}<span class="timeline-time" style="font-size:.9rem">{{ item.start_time }}</span>{% endif %}
+      </div>
+      {% if item.performer %}<p class="muted" style="font-size:.88rem">🎤 {{ item.performer }}</p>{% endif %}
+      {% if item.prize_giver %}<p class="muted" style="font-size:.88rem">🏆 Prize/gift by: {{ item.prize_giver }}</p>{% endif %}
+      {% if item.venue %}<p class="muted" style="font-size:.85rem">📍 {{ item.venue }}</p>{% endif %}
+      {% if item.description %}<p class="muted" style="margin-top:4px">{{ item.description }}</p>{% endif %}
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="empty reveal">Programme details will be published soon.</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="eyebrow reveal">Event finance</div>
+<h1 class="reveal">Finance overview</h1>
+
+<div class="grid g3" style="margin:14px 0 22px">
+  <div class="stat moss reveal"><div class="n">₹{{ '%.0f'|format(total_received) }}</div><div class="l">Total collected</div></div>
+  <div class="stat bloom reveal"><div class="n">₹{{ '%.0f'|format(total_spent) }}</div><div class="l">Total spent</div></div>
+  <div class="stat {% if balance >= 0 %}reveal{% else %}bloom reveal{% endif %}">
+    <div class="n">₹{{ '%.0f'|format(balance|abs) }}</div>
+    <div class="l">{{ 'Surplus' if balance >= 0 else 'Deficit' }}</div>
+  </div>
+</div>
+
+<div class="card reveal" style="margin-bottom:18px">
+  <h3>🧾 Expenses by item</h3>
+  {% if items %}
+  <table>
+    <thead><tr><th>Item</th><th>Note</th><th style="text-align:right">Amount</th></tr></thead>
+    <tbody>
+      {% for e in items %}
+      <tr><td><b>{{ e.name }}</b></td><td class="muted">{{ e.note or '—' }}</td>
+          <td style="text-align:right">₹{{ '%.2f'|format(e.amount) }}</td></tr>
+      {% endfor %}
+      <tr style="font-weight:800"><td>Total</td><td></td>
+          <td style="text-align:right">₹{{ '%.2f'|format(total_spent) }}</td></tr>
+    </tbody>
+  </table>
+  {% else %}<div class="empty">No expenses recorded yet.</div>{% endif %}
+</div>
+
+{% if contributions %}
+<div class="card reveal">
+  <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:12px">
+    <h3 style="margin:0">💰 Contributions
+      {% if contrib_public and not current_user.is_admin %}
+        <span class="pill ok" style="font-size:.72rem;vertical-align:middle">Public</span>
+      {% elif current_user.is_admin %}
+        <span class="pill gold" style="font-size:.72rem;vertical-align:middle">Admin view</span>
+      {% endif %}
+    </h3>
+    <span class="muted" style="font-size:.85rem">{{ heads }} contributor{{ 's' if heads != 1 }} · avg ₹{{ '%.0f'|format(total_received / heads if heads else 0) }} each</span>
+  </div>
+  <table>
+    <thead><tr><th>Contributor</th><th>Note</th><th style="text-align:right">Amount</th></tr></thead>
+    <tbody>
+      {% for c in contributions %}
+      <tr><td><b>{{ c.contributor }}</b></td><td class="muted">{{ c.note or '—' }}</td>
+          <td style="text-align:right">₹{{ '%.2f'|format(c.amount) }}</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% elif not contrib_public and not current_user.is_admin %}
+<div class="card reveal">
+  <p class="muted" style="text-align:center;padding:12px 0">
+    Individual contributor details are currently private.<br>
+    <span style="font-size:.85rem">The admin can make them visible if needed for transparency.</span>
+  </p>
+</div>
+{% endif %}
+{% endblock %}

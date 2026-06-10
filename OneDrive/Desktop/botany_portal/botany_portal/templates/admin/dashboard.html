@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block content %}
+{% include "admin/_nav.html" %}
+<div class="section-title reveal">
+  <div><div class="eyebrow">Control room</div><h1>Dashboard</h1></div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap">
+    <form method="post" action="{{ url_for('admin_maintenance') }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <button class="btn {{ 'gold' if maintenance_on else 'dark' }}" type="submit">
+        {{ '🔧 Go live' if is_mobile else ('🔧 Maintenance ON — click to go live' if maintenance_on else '🔧 Put site in maintenance') }}
+      </button>
+    </form>
+    {% if active_event %}
+    <form method="post" action="{{ url_for('admin_toggle_attendance') }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <button class="btn {{ 'leafy' if attendance_is_open else 'dark' }}" type="submit">
+        {% if attendance_is_open %}
+          {{ '✅ Close check-in' if is_mobile else '✅ Attendance open — click to close' }}
+        {% else %}
+          {{ '🔓 Open check-in' if is_mobile else '🔓 Open attendance desk' }}
+        {% endif %}
+      </button>
+    </form>
+    {% endif %}
+  </div>
+</div>
+
+<div class="grid g4 stats-grid" style="margin-bottom:22px">
+  <div class="stat reveal"><div class="n">{{ stats.total }}</div><div class="l">Accounts</div></div>
+  <div class="stat moss reveal"><div class="n">{{ stats.present }}</div><div class="l">Checked in</div></div>
+  <div class="stat reveal"><div class="n">{{ stats.rsvp_yes }}</div><div class="l">RSVP accepted</div></div>
+  <div class="stat bloom reveal"><div class="n">{{ stats.collected }}</div><div class="l">Tiffin collected</div></div>
+</div>
+
+<div class="grid g2">
+  <div class="card reveal">
+    <h3>🍱 Tiffin</h3>
+    <table>
+      <tr><td>Accepted</td><td style="text-align:right"><b>{{ stats.accepted }}</b></td></tr>
+      <tr><td>🥗 Veg</td><td style="text-align:right">{{ stats.veg }}</td></tr>
+      <tr><td>🍗 Non-veg</td><td style="text-align:right">{{ stats.nonveg }}</td></tr>
+      <tr><td>Collected</td><td style="text-align:right">{{ stats.collected }}</td></tr>
+    </table>
+  </div>
+  <div class="card reveal">
+    <h3>🧾 Finance <span class="pill gold">admin only</span></h3>
+    <table>
+      <tr><td>Received</td><td style="text-align:right"><b>₹{{ '%.2f'|format(stats.received) }}</b></td></tr>
+      <tr><td>Spent</td><td style="text-align:right">₹{{ '%.2f'|format(stats.spent) }}</td></tr>
+      <tr><td>Balance</td><td style="text-align:right"><b style="color:{{ 'var(--moss)' if stats.balance>=0 else 'var(--bloom)' }}">₹{{ '%.2f'|format(stats.balance) }}</b></td></tr>
+      <tr><td>Per head ({{ stats.heads }})</td><td style="text-align:right">₹{{ '%.2f'|format(stats.per_head) }}</td></tr>
+    </table>
+    <a class="btn leafy sm" href="{{ url_for('admin_finance') }}" style="margin-top:12px">Manage finance</a>
+  </div>
+</div>
+{% endblock %}

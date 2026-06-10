@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="eyebrow reveal">Edit event</div>
+<h1 class="reveal">{{ ev.name }}</h1>
+<form class="card reveal" method="post" style="margin-top:14px">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <div class="grid g2">
+    <div><label>Event name</label><input name="name" value="{{ ev.name }}" required></div>
+    <div><label>Tagline / theme</label><input name="tagline" value="{{ ev.tagline or '' }}"></div>
+  </div>
+  <div class="grid g3">
+    <div><label>Date</label><input name="date" type="date" value="{{ ev.date.isoformat() if ev.date else '' }}"></div>
+    <div><label>Time</label><input name="time" type="time" value="{{ ev.time.strftime('%H:%M') if ev.time else '' }}"></div>
+    <div><label>Venue</label><input name="venue" value="{{ ev.venue or '' }}"></div>
+  </div>
+  <label>Description</label>
+  <textarea name="description" rows="3">{{ ev.description or '' }}</textarea>
+  <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap">
+    <button class="btn leafy" type="submit">Save changes</button>
+    <a class="btn ghost dark" href="{{ url_for('admin_event') }}">Cancel</a>
+  </div>
+</form>
+{% endblock %}

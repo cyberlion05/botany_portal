@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+{% include "admin/_nav.html" %}
+<div class="eyebrow reveal">Field trips</div><h1 class="reveal">Excursion</h1>
+<form class="card reveal" method="post" enctype="multipart/form-data" style="margin-bottom:18px">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <div class="grid g3"><div><label>Title</label><input name="title" required></div><div><label>Place</label><input name="place"></div><div><label>Date</label><input name="date_text"></div></div>
+  <label>Description</label><textarea name="description"></textarea>
+  <div class="grid g2" style="align-items:end"><div><label>Photo</label><input type="file" name="photo" accept="image/*"></div><div><label>Order</label><input name="sort_order" type="number" value="0"></div></div>
+  <button class="btn leafy" type="submit" style="margin-top:12px">+ Add excursion</button>
+</form>
+<div class="card reveal">{% if items %}<table><thead><tr><th>Title</th><th>Place</th><th>Date</th><th></th></tr></thead><tbody>
+{% for x in items %}<tr><td><b>{{ x.title }}</b></td><td>{{ x.place }}</td><td class="muted">{{ x.date_text }}</td><td style="text-align:right"><form method="post" action="{{ url_for('admin_delete_excursion', xid=x.id) }}" style="display:inline"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn danger sm">Delete</button></form></td></tr>{% endfor %}
+</tbody></table>{% else %}<div class="empty">No excursions added.</div>{% endif %}</div>
+{% endblock %}

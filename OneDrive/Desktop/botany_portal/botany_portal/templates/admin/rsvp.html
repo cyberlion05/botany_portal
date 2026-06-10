@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block content %}
+{% include "admin/_nav.html" %}
+<div class="eyebrow reveal">Invitation</div><h1 class="reveal">RSVP responses</h1>
+<p class="lead reveal" style="margin-bottom:16px">Who has accepted the digital invitation — for seating, tiffin and arrangements.</p>
+<div class="grid g3" style="margin-bottom:20px">
+  <div class="stat moss reveal"><div class="n">{{ accepted }}</div><div class="l">Accepted</div></div>
+  <div class="stat bloom reveal"><div class="n">{{ declined }}</div><div class="l">Declined</div></div>
+  <div class="stat reveal"><div class="n">{{ pending }}</div><div class="l">No response</div></div>
+</div>
+<div class="card reveal">
+  {% if people %}
+  <table>
+    <thead><tr><th>Name</th><th>Role</th><th>Response</th><th>When</th></tr></thead>
+    <tbody>
+    {% for p in people %}
+      <tr>
+        <td><b>{{ p.name }}</b></td>
+        <td><span class="pill no">{{ p.role }}</span></td>
+        <td>
+          {% if p.rsvp and p.rsvp.responded_at and p.rsvp.accepted %}<span class="pill ok">Accepted ✓</span>
+          {% elif p.rsvp and p.rsvp.responded_at %}<span class="pill nonveg">Declined</span>
+          {% else %}<span class="muted">— awaiting —</span>{% endif %}
+        </td>
+        <td class="muted">{{ p.rsvp.responded_at.strftime('%d %b, %H:%M') if p.rsvp and p.rsvp.responded_at else '' }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% else %}<div class="empty">No faculty/student accounts yet.</div>{% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="eyebrow reveal">About</div>
+<h1 class="reveal">{{ setting('about_title', 'About the Department') }}</h1>
+<div class="card reveal" style="margin-top:14px">
+  <p style="white-space:pre-line;font-size:1.05rem">{{ setting('about_body', 'The Department of Botany at Chandernagore College fosters the study of plant sciences through teaching, laboratory work, field excursions and research. (Admin can edit this text from the dashboard.)') }}</p>
+  {% if setting('about_hod') %}<p class="note" style="margin-top:18px">{{ setting('about_hod') }}</p>{% endif %}
+</div>
+{% endblock %}

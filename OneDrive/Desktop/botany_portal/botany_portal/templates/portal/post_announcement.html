@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="eyebrow reveal">Team communication</div>
+<h1 class="reveal">Post an announcement</h1>
+<p class="lead reveal" style="margin-bottom:16px">Your announcement will be reviewed by the admin before it goes public.</p>
+
+<form class="card reveal" method="post" style="margin-bottom:22px">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <label for="title">Title</label>
+  <input id="title" name="title" required>
+  <label for="body">Message</label>
+  <textarea id="body" name="body" required></textarea>
+  <button class="btn leafy" type="submit" style="margin-top:14px">Submit for approval</button>
+</form>
+
+{% if my_posts %}
+<div class="eyebrow reveal" style="margin-bottom:10px">Your previous posts</div>
+<div class="grid" style="gap:10px">
+  {% for a in my_posts %}
+  <div class="card reveal" style="display:flex;align-items:flex-start;justify-content:space-between;gap:14px">
+    <div style="flex:1">
+      <h3 style="margin-bottom:4px">{{ a.title }}</h3>
+      <p class="muted" style="font-size:.9rem">{{ a.body }}</p>
+      <p class="muted" style="font-size:.78rem;margin-top:6px">{{ a.created_at.strftime('%d %b %Y, %H:%M') }}</p>
+    </div>
+    <span class="pill {% if a.status=='approved' %}ok{% elif a.status=='pending' %}gold{% else %}no{% endif %}" style="flex-shrink:0">
+      {% if a.status == 'approved' %}✓ Published
+      {% elif a.status == 'pending' %}⏳ Pending
+      {% else %}✕ Rejected{% endif %}
+    </span>
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+{% endblock %}

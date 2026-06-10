@@ -1,0 +1,37 @@
+{% from "chat/_macros.html" import render_poll %}
+{% extends "base.html" %}
+{% block content %}
+<div class="chat-header reveal">
+  <div><div class="eyebrow">Support</div><h1 style="margin:0">💬 Chat with us</h1></div>
+  <span class="muted" style="font-size:.85rem">Messages go to the event coordinators</span>
+</div>
+<div class="chat-wrap reveal">
+  <div class="chat-msgs" id="chatMsgs">
+    {% for kind, item in timeline %}
+      {% if kind == 'msg' %}
+        <div class="msg {{ 'mine' if item.sender_id == current_user.id else 'theirs' }}" data-msgid="{{ item.id }}">
+          <div class="msg-bubble">{{ item.body }}</div>
+          <div class="msg-meta">
+            {% if item.sender_id != current_user.id %}{{ item.sender_name }} · {% endif %}{{ item.sent_at.strftime('%d %b, %H:%M') }}
+          </div>
+        </div>
+      {% else %}
+        {{ render_poll(item, poll_data) }}
+      {% endif %}
+    {% endfor %}
+    {% if not timeline %}<p class="muted chat-empty" style="text-align:center;margin:auto">No messages yet. Ask us anything!</p>{% endif %}
+  </div>
+  <div class="chat-input">
+    <textarea id="msgInput" placeholder="Type your message…" rows="1"></textarea>
+    <button class="btn leafy" onclick="sendMsg()">Send</button>
+  </div>
+</div>
+<script>
+window.CHAT = {
+  room: "{{ room }}", csrf: "{{ csrf_token() }}",
+  myId: {{ current_user.id }}, lastMsgId: {{ last_msg_id }},
+  lastPollId: {{ last_poll_id }}, isAdmin: false,
+};
+</script>
+<script src="{{ url_for('static', filename='js/chat.js') }}"></script>
+{% endblock %}

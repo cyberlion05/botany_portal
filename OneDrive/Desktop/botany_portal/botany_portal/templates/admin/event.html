@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="section-title reveal">
+  <div><div class="eyebrow">Event scheduling</div><h1>Event Setup</h1></div>
+</div>
+
+{# ── Create new event form ── #}
+<details class="card reveal" style="margin-bottom:20px" {% if not events %}open{% endif %}>
+  <summary class="btn leafy" style="display:inline-flex;cursor:pointer;list-style:none">+ Schedule a new event</summary>
+  <form method="post" style="margin-top:16px">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div class="grid g2">
+      <div><label>Event name</label><input name="name" required placeholder="e.g. Annual Botany Fest 2026"></div>
+      <div><label>Tagline / theme <span class="muted" style="font-weight:400">(optional)</span></label><input name="tagline" placeholder="e.g. Roots &amp; Shoots"></div>
+    </div>
+    <div class="grid g3">
+      <div><label>Date</label><input name="date" type="date"></div>
+      <div><label>Time</label><input name="time" type="time"></div>
+      <div><label>Venue</label><input name="venue" placeholder="Seminar Hall"></div>
+    </div>
+    <label>Description</label>
+    <textarea name="description" rows="2" placeholder="Brief description of the event…"></textarea>
+    <button class="btn leafy" type="submit" style="margin-top:12px">Create draft</button>
+  </form>
+</details>
+
+{# ── Events list ── #}
+{% if events %}
+  {% for ev in events %}
+  <div class="card reveal" style="margin-bottom:14px;border-left:4px solid
+    {{ 'var(--moss)' if ev.status=='published' else 'var(--pollen)' if ev.status=='draft' else 'var(--muted)' }}">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px">
+      <div>
+        <h3 style="margin-bottom:2px">{{ ev.name }}
+          <span class="pill {{ 'ok' if ev.status=='published' else 'gold' if ev.status=='draft' else 'no' }}"
+                style="font-size:.7rem;vertical-align:middle">{{ ev.status }}</span>
+          {% if ev.invitation_sent %}<span class="pill ok" style="font-size:.7rem;vertical-align:middle">✉ Invitation live</span>{% endif %}
+        </h3>
+        {% if ev.tagline %}<p class="muted" style="font-style:italic;margin-bottom:4px">{{ ev.tagline }}</p>{% endif %}
+        <div style="display:flex;flex-wrap:wrap;gap:12px;font-size:.88rem;color:var(--muted)">
+          {% if ev.date %}<span>📅 {{ ev.date.strftime('%A, %d %B %Y') }}</span>{% else %}<span>📅 Date not set</span>{% endif %}
+          {% if ev.time %}<span>🕐 {{ ev.time.strftime('%I:%M %p') }}</span>{% endif %}
+          {% if ev.venue %}<span>📍 {{ ev.venue }}</span>{% endif %}
+        </div>
+        {% if ev.description %}<p class="muted" style="margin-top:6px;font-size:.9rem">{{ ev.description }}</p>{% endif %}
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0;min-width:130px">
+        <a class="btn ghost sm" href="{{ url_for('admin_edit_event', eid=ev.id) }}">✎ Edit</a>
+        {% if ev.status == 'draft' %}
+          <form method="post" action="{{ url_for('admin_publish_event', eid=ev.id) }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button class="btn leafy sm full" type="submit">🌐 Publish event</button>
+          </form>
+          <form method="post" action="{{ url_for('admin_delete_event', eid=ev.id) }}" onsubmit="return confirm('Delete this draft?')">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button class="btn danger sm full">Delete draft</button>
+          </form>
+        {% elif ev.status == 'published' %}
+          {% if not ev.invitation_sent %}
+          <form method="post" action="{{ url_for('admin_send_invitation', eid=ev.id) }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button class="btn gold sm full" type="submit">✉ Send invitation</button>
+          </form>
+          {% else %}
+          <form method="post" action="{{ url_for('admin_recall_invitation', eid=ev.id) }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button class="btn ghost sm full" type="submit">Recall invitation</button>
+          </form>
+          {% endif %}
+          <form method="post" action="{{ url_for('admin_toggle_attendance') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button class="btn {{ 'leafy' if ev.attendance_open else 'dark' }} sm full" type="submit">
+              {{ '✅ Close attendance' if ev.attendance_open else '🔓 Open attendance desk' }}
+            </button>
+          </form>
+          <form method="post" action="{{ url_for('admin_complete_event', eid=ev.id) }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button class="btn dark sm full" type="submit">✓ Mark completed</button>
+          </form>
+          <form method="post" action="{{ url_for('admin_draft_event', eid=ev.id) }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button class="btn ghost sm full" type="submit">Move to draft</button>
+          </form>
+        {% else %}
+          <form method="post" action="{{ url_for('admin_draft_event', eid=ev.id) }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button class="btn ghost sm full" type="submit">Reopen as draft</button>
+          </form>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+{% else %}
+  <div class="empty">No events yet — create one above.</div>
+{% endif %}
+{% endblock %}

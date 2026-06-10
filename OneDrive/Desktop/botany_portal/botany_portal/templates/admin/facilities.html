@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+{% include "admin/_nav.html" %}
+<div class="eyebrow reveal">Infrastructure</div><h1 class="reveal">Facilities</h1>
+<form class="card reveal" method="post" style="margin-bottom:18px">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <div class="grid g4" style="align-items:end"><div><label>Icon (emoji)</label><input name="icon" placeholder="🔬"></div><div style="grid-column:span 2"><label>Title</label><input name="title" required></div><div><label>Order</label><input name="sort_order" type="number" value="0"></div></div>
+  <label>Description</label><textarea name="description"></textarea>
+  <button class="btn leafy" type="submit" style="margin-top:12px">+ Add facility</button>
+</form>
+<div class="card reveal">{% if facilities %}<table><thead><tr><th></th><th>Title</th><th></th></tr></thead><tbody>
+{% for c in facilities %}<tr><td style="font-size:1.4rem">{{ c.icon }}</td><td><b>{{ c.title }}</b><br><span class="muted" style="font-size:.85rem">{{ c.description }}</span></td><td style="text-align:right"><form method="post" action="{{ url_for('admin_delete_facility', fid=c.id) }}" style="display:inline"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn danger sm">Delete</button></form></td></tr>{% endfor %}
+</tbody></table>{% else %}<div class="empty">No facilities added.</div>{% endif %}</div>
+{% endblock %}

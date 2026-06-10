@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+{% block content %}
+{% include "admin/_nav.html" %}
+<div class="eyebrow reveal">People</div>
+<h1 class="reveal">Accounts</h1>
+<p class="lead reveal" style="margin-bottom:16px">You create every account — there's no public sign-up. Fields change depending on the role you pick.</p>
+
+<form class="card reveal" method="post" action="{{ url_for('admin_add_user') }}" style="margin-bottom:18px">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <div class="grid g2" style="align-items:end">
+    <div><label>Full name</label><input name="name" required></div>
+    <div><label>Role</label>
+      <select name="role" id="roleSel" onchange="roleFields()">
+        <option value="student">Student</option>
+        <option value="coordinator">Coordinator</option>
+        <option value="faculty">Faculty</option>
+      </select>
+    </div>
+  </div>
+
+  {# Student fields #}
+  <div id="fields-student" class="role-fields">
+    <div class="grid g3" style="align-items:end">
+      <div><label>Roll number</label><input name="roll_number" id="st_roll"></div>
+      <div><label>Batch</label><input name="batch" placeholder="2024–2027"></div>
+      <div><label>Mobile number</label><input name="mobile" id="st_mobile" inputmode="numeric" placeholder="10-digit mobile"></div>
+    </div>
+    <p class="note" style="margin-top:8px">The student's password will automatically be the <b>last 6 digits</b> of this mobile number. They sign in with their roll number.</p>
+  </div>
+
+  {# Coordinator fields #}
+  <div id="fields-coordinator" class="role-fields" style="display:none">
+    <div class="grid g3" style="align-items:end">
+      <div><label>Username</label><input name="username" id="co_user"></div>
+      <div><label>Password</label><input name="password" placeholder="set a password"></div>
+      <div><label class="inline-check"><input type="checkbox" name="password_protected" checked> Require password</label></div>
+    </div>
+  </div>
+
+  {# Faculty fields #}
+  <div id="fields-faculty" class="role-fields" style="display:none">
+    <p class="note" style="margin-top:4px">Faculty sign in by simply <b>selecting their name</b> on the login page — no roll number, no password needed.</p>
+  </div>
+
+  <button class="btn leafy" type="submit" style="margin-top:14px">+ Create account</button>
+</form>
+<script>
+function roleFields(){
+  var r = document.getElementById('roleSel').value;
+  ['student','coordinator','faculty'].forEach(function(k){
+    document.getElementById('fields-'+k).style.display = (k===r ? 'block':'none');
+  });
+}
+roleFields();
+</script>
+
+<div class="card reveal">
+  {% if users %}
+  <table>
+    <thead><tr><th>Name</th><th>Username</th><th>Role</th><th>Roll / Batch</th><th>Security</th><th>Device</th><th></th></tr></thead>
+    <tbody>
+    {% for u in users %}
+      <tr>
+        <td><b>{{ u.name }}</b></td>
+        <td>{{ u.username }}</td>
+        <td><span class="pill {{ 'gold' if u.is_admin else 'no' }}">{{ u.role }}</span></td>
+        <td class="muted">{{ u.roll_number or '—' }}{% if u.batch %} · {{ u.batch }}{% endif %}</td>
+        <td>{% if u.is_admin %}<span class="pill gold">secured</span>{% elif u.role=='faculty' %}<span class="pill no">name only</span>{% elif u.role=='student' %}📱 mobile{% elif u.password_protected %}🔑 password{% else %}<span class="pill no">no password</span>{% endif %}</td>
+        <td>{% if u.device_token %}🔒 locked{% else %}<span class="muted">free</span>{% endif %}</td>
+        <td style="text-align:right;white-space:nowrap">
+          {% if not u.is_admin %}
+          {% if u.role == 'student' %}
+          <details style="display:inline-block;text-align:left">
+            <summary class="btn ghost sm" style="display:inline-block">Edit</summary>
+            <form method="post" action="{{ url_for('admin_update_user', uid=u.id) }}" style="margin-top:8px;padding:12px;border:1px solid var(--line);border-radius:10px;background:#fffdf8;min-width:260px">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <label>Name</label><input name="name" value="{{ u.name }}">
+              <div class="grid g2"><div><label>Roll number</label><input name="roll_number" value="{{ u.roll_number or '' }}"></div><div><label>Batch</label><input name="batch" value="{{ u.batch or '' }}"></div></div>
+              <label>Mobile <span class="muted" style="font-weight:400">(updates password)</span></label>
+              <input name="mobile" inputmode="numeric" value="{{ u.mobile or '' }}">
+              <button class="btn leafy sm" type="submit" style="margin-top:8px">Save</button>
+            </form>
+          </details>
+          {% elif u.role == 'coordinator' %}
+          <details style="display:inline-block;text-align:left">
+            <summary class="btn ghost sm" style="display:inline-block">Edit</summary>
+            <form method="post" action="{{ url_for('admin_update_user', uid=u.id) }}" style="margin-top:8px;padding:12px;border:1px solid var(--line);border-radius:10px;background:#fffdf8;min-width:260px">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <label>Name</label><input name="name" value="{{ u.name }}">
+              <div class="grid g2"><div><label>Username</label><input name="username" value="{{ u.username }}"></div><div><label>Roll</label><input name="roll_number" value="{{ u.roll_number or '' }}"></div></div>
+              <label class="inline-check"><input type="checkbox" name="password_protected" {{ 'checked' if u.password_protected }}> Require password</label>
+              <label>New password <span class="muted" style="font-weight:400">(blank = keep)</span></label>
+              <input name="password" placeholder="set new password">
+              <button class="btn leafy sm" type="submit" style="margin-top:8px">Save</button>
+            </form>
+          </details>
+          {% elif u.role == 'faculty' %}
+          <details style="display:inline-block;text-align:left">
+            <summary class="btn ghost sm" style="display:inline-block">Edit</summary>
+            <form method="post" action="{{ url_for('admin_update_user', uid=u.id) }}" style="margin-top:8px;padding:12px;border:1px solid var(--line);border-radius:10px;background:#fffdf8;min-width:220px">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <label>Name <span class="muted" style="font-weight:400">(also updates their login)</span></label>
+              <input name="name" value="{{ u.name }}">
+              <button class="btn leafy sm" type="submit" style="margin-top:8px">Save</button>
+            </form>
+          </details>
+          {% endif %}
+          {% if u.device_token %}<form method="post" action="{{ url_for('admin_reset_device', uid=u.id) }}" style="display:inline"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn ghost sm" type="submit">↺ Reset</button></form>{% endif %}
+          <form method="post" action="{{ url_for('admin_delete_user', uid=u.id) }}" onsubmit="return confirm('Remove {{ u.name }}?')" style="display:inline"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn danger sm" type="submit">✕</button></form>
+          {% endif %}
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% else %}<div class="empty">No accounts yet.</div>{% endif %}
+</div>
+{% endblock %}

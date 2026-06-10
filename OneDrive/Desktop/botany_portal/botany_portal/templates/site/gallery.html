@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="eyebrow reveal">Moments</div>
+<h1 class="reveal">Gallery</h1>
+{% if photos %}
+<div class="gallery reveal" style="margin-top:18px">
+  {% for p in photos %}<figure><img src="{{ url_for('static', filename='uploads/' ~ p.filename) }}" alt="{{ p.caption }}">{% if p.caption %}<figcaption>{{ p.caption }}</figcaption>{% endif %}</figure>{% endfor %}
+</div>
+{% else %}<div class="empty">Photos will be added here. 🌼</div>{% endif %}
+{% endblock %}

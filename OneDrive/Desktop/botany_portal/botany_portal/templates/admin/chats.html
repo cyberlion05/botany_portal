@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="eyebrow reveal">Inbox</div>
+<h1 class="reveal">Student chats</h1>
+<p class="lead reveal" style="margin-bottom:16px">Students can message you here. Click a name to open the conversation.</p>
+<div class="card reveal">
+  {% if students %}
+  {% for s in students %}
+  {% set lm = last_msgs.get(s.id) %}
+  <a class="inbox-row" href="{{ url_for('admin_chat_student', uid=s.id) }}">
+    <div class="inbox-avatar">{{ s.name[0].upper() }}</div>
+    <div style="flex:1;min-width:0">
+      <div style="font-weight:800;font-size:.95rem">{{ s.name }}</div>
+      <div class="inbox-preview">{{ lm.body if lm else 'No messages yet' }}</div>
+    </div>
+    {% if lm %}<div class="inbox-time">{{ lm.sent_at.strftime('%d %b') }}</div>{% endif %}
+  </a>
+  {% endfor %}
+  {% else %}
+  <div class="empty">No student accounts yet.</div>
+  {% endif %}
+</div>
+{% endblock %}
